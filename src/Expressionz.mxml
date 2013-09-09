@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="158" height="477" styleName="">
+	<mx:states>
+		<mx:State name="Logged In">
+			<mx:RemoveChild target="{FBLogin}"/>
+			<mx:RemoveChild target="{button2}"/>
+			<mx:RemoveChild target="{button3}"/>
+			<mx:RemoveChild target="{button4}"/>
+			<mx:SetProperty name="width" value="238"/>
+			<mx:SetProperty name="height" value="85"/>
+			<mx:AddChild position="lastChild">
+				<mx:Label x="10" y="10" text="Photo Uploader"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:HRule x="10" y="36" id="hrule1"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Label x="10" y="46" text="Status Updater" id="label1"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Image x="118" y="6" width="21" height="22" click=" uploaderClicked() " visible = "{currentState == &quot;Logged In&quot;}" id="image2" source="@Embed('../assets/downArrow.png')" scaleContent="true">
+				</mx:Image>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Image x="122" y="46" width="17" height="23" click="statusUpdaterClicked()" scaleContent="true" autoLoad="true" id="statusUpdaterImg" visible="true" source="@Embed('../assets/downArrow.png')">
+				</mx:Image>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="Photo Uploader Intermediate" basedOn="Logged In" enterState="funcf1();" >
+			<mx:SetProperty target="{statusUpdaterImg}" name="visible" value="{currentState == &quot;Logged In&quot;}"/>
+			<mx:SetProperty target="{image2}" name="autoLoad" value="true"/>
+		</mx:State>
+		<mx:State name="Photo Uploader Intermediate1" basedOn="Photo Uploader Intermediate" >
+			<mx:SetProperty name="height" value="500"/>
+			<mx:SetProperty target="{hrule1}" name="y" value="450"/>
+			<mx:SetProperty target="{label1}" name="y" value="460"/>
+			<mx:SetProperty name="width" value="700"/>
+			<mx:AddChild position="lastChild">
+				<mx:TileList x="31" y="49" width="226" height="128" dataProvider="{dropBoxDP}" itemRenderer="mx.controls.Image" labelField="nativePath" enabled="{FBChkBox.enabled || PicasaChkBox.enabled}"></mx:TileList>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:TileList x="31" y="233" width="615" height="90" enabled="{FBAlbumsRadio.selected &amp;&amp;FBChkBox.selected}" id="FBTileList" itemRenderer="mx.controls.Image" dataProvider="{fbPhotos}" labelField="src"></mx:TileList>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:TileList x="31" y="352" width="615" height="90" enabled="{PicasaAlbumsRadio.selected &amp;&amp;PicasaChkBox.selected}" id="PicasaTileList" itemRenderer="mx.controls.Image"></mx:TileList>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:CheckBox x="310" y="49" label="Facebook" enabled="{fbLoggedIn}" selected="false" id="FBChkBox" width="80"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:CheckBox x="506" y="49" label="Picasa" enabled="{picasaLoggedIn}" selected="false" id="PicasaChkBox"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:RadioButtonGroup id="FacebookGroup"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:RadioButton x="330" y="79" groupName="FacebookGroup" enabled="{FBChkBox.selected}" id="FBNewAlbumRadio" selected="true"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:RadioButton x="330" y="105" label="Existing Album" groupName="FacebookGroup" enabled="{FBChkBox.selected}" id="FBAlbumsRadio"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:RadioButton x="528" y="79" groupName="PicasaGroup" enabled="{PicasaChkBox.selected}" id="PicasaNewAlbumRadio" selected="true"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:RadioButton x="528" y="105" label="Existing Album" groupName="PicasaGroup" enabled="{PicasaChkBox.selected}" id="PicasaAlbumsRadio"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:TextInput x="352" y="77" text="New Album Name" width="108" enabled="{FBNewAlbumRadio.selected &amp;&amp;FBChkBox.selected}" color="#809296" id="FBAlbumName"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:TextInput x="550" y="77" text="New Album Name" width="106" enabled="{PicasaNewAlbumRadio.selected &amp;&amp;PicasaChkBox.selected}" color="#809296" id="PicasaAlbumName"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:ComboBox x="352" y="135" width="131" enabled="{FBAlbumsRadio.selected &amp;&amp;FBChkBox.selected}" id="FBComboBox" dataProvider="{fbAlbums}" labelField="name" change="onFBAlbumChange()"></mx:ComboBox>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:ComboBox x="557" y="135" width="131" enabled="{PicasaAlbumsRadio.selected &amp;&amp;PicasaChkBox.selected}" id="PicasaComboBox"></mx:ComboBox>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Button x="56" y="194" label="Browse" width="74" click="onBrowseClick()" enabled="{FBChkBox.enabled || PicasaChkBox.enabled}"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Button x="151" y="194" label="Upload" width="82" enabled="{dropBoxDP.length &gt;0}" click="handleUploadClick()"/>
+			</mx:AddChild>
+			<mx:RemoveChild target="{image2}"/>
+			<mx:SetProperty target="{statusUpdaterImg}" name="y" value="460"/>
+			<mx:SetProperty target="{statusUpdaterImg}" name="visible" value="false"/>
+			<mx:AddChild position="lastChild">
+				<mx:Image x="118" y="9" width="12" height="19" source="@Embed('../assets/upArrow.png')" scaleContent="true" visible="{currentState == &quot;Photo Uploader Intermediate1&quot;}" click="currentState = &quot;Logged In&quot;" autoLoad="true"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="Status Updater Intermediate" basedOn="Logged In" enterState="funcf1(true);"/>
+		<mx:State name="Status Updater Intermediate1" basedOn="Status Updater Intermediate" >
+			<mx:SetProperty name="height" value="179"/>
+			<mx:SetProperty name="width" value="518"/>
+			<mx:AddChild position="lastChild">
+				<mx:TextArea x="118" y="69" width="238" height="76" id="statusArea" text="Enter Text Here " editable="true" enabled="{FBStatusChkBox.enabled == true || TwitterStatusChkBox.enabled == true}"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:CheckBox x="398" y="69" label="Facebook" id="FBStatusChkBox" enabled="{this.fbLoggedIn}"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:CheckBox x="398" y="99" label="Twitter" id="TwitterStatusChkBox" enabled="{this.twitterLoggedIn}"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Button x="411" y="129" label="Publish" click="fbChangeStatus()">
+					<mx:enabled>{FBStatusChkBox.selected || TwitterStatusChkBox.selected}</mx:enabled>
+				</mx:Button>
+			</mx:AddChild>
+			<mx:SetProperty target="{statusUpdaterImg}" name="visible" value="{ currentState == &quot;Logged In&quot;}"/>
+			<mx:AddChild position="lastChild">
+				<mx:Image x="118" y="46" width="21" height="15" visible="{currentState == &quot;Status Updater Intermediate1&quot;}" source="@Embed('../assets/upArrow.png')" click="currentState = &quot;Logged In&quot;"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="Uploading" basedOn="Photo Uploader Intermediate1">
+			<mx:AddChild position="lastChild">
+				<mx:Canvas x="8" y="10" width="684" height="478" backgroundColor="#918C8C" backgroundAlpha="0.26">
+				</mx:Canvas>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="Updating" basedOn="Status Updater Intermediate1">
+			<mx:AddChild position="lastChild">
+				<mx:Canvas x="5" y="5" width="506" height="169" color="#8F5858" backgroundAlpha="0.26" backgroundColor="#918C8C">
+				</mx:Canvas>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	<mx:transitions>
+		<mx:Transition fromState="Logged In" toState="Photo Uploader Intermediate">
+			<mx:Sequence>
+				<mx:Parallel>
+					<mx:Resize duration="500" target="{this}" heightFrom = "{this.height}"  heightTo="500" />
+					<mx:Move duration="500" target="{hrule1}" yFrom="{hrule1.y}" yTo="450"/>
+					<mx:Move duration="500" target="{label1}" yFrom="{label1.y}" yTo="460"/>
+					<mx:Move duration="500" target="{statusUpdaterImg}" yFrom="{statusUpdaterImg.y}" yTo="460"/>						
+				</mx:Parallel>
+				<mx:Resize duration="500" target="{this}" widthFrom = "{this.width}"  widthTo="700" />
+			</mx:Sequence>
+		</mx:Transition>
+		<mx:Transition fromState="Photo Uploader Intermediate1" toState="Logged In">
+			<mx:Sequence>
+				<mx:Resize duration="500" target="{this}" widthFrom = "{this.width}"  widthTo="238" />
+				<mx:Parallel>
+					<mx:Resize duration="500" target="{this}" heightFrom = "{this.height}"  heightTo="85" />
+					<mx:Move duration="500" target="{hrule1}" yFrom="{hrule1.y}" yTo="36"/>
+					<mx:Move duration="500" target="{label1}" yFrom="{label1.y}" yTo="46"/>
+					<mx:Move duration="500" target="{statusUpdaterImg}" yFrom="{statusUpdaterImg.y}" yTo="46"/>						
+				</mx:Parallel>
+				
+			</mx:Sequence>
+			
+		</mx:Transition>
+		<mx:Transition fromState="Logged In" toState="Status Updater Intermediate">
+			<mx:Sequence>
+				
+				<mx:Resize duration="500" target="{this}" widthFrom = "{this.width}"  widthTo="518" />
+				<mx:Parallel>
+					<mx:Resize duration="500" target="{this}" heightFrom = "{this.height}"  heightTo="179" />
+				</mx:Parallel>
+				
+				
+			</mx:Sequence>
+		</mx:Transition>
+		
+		<mx:Transition fromState="Status Updater Intermediate1" toState="Logged In">
+			<mx:Sequence>
+				<mx:Resize duration="500" target="{this}" widthFrom = "{this.width}"  widthTo="238" />
+				<mx:Parallel>
+					<mx:Resize duration="500" target="{this}" heightFrom = "{this.height}"  heightTo="85" />
+				</mx:Parallel>
+			</mx:Sequence>
+		</mx:Transition>
+	</mx:transitions>
+	<mx:Button x="21" y="68" label="Facebook Login" id="FBLogin" click="fbLoginFunc()"/>
+	<mx:Button x="30" y="124" label="Picasa Login" id="button2"/>
+	<mx:Button x="41.5" y="248" label="Proceed" id="button4" click="currentState = &quot;Logged In&quot;"/>
+	<mx:Button x="25.75" y="182" label="Twitter Login" width="104.5" height="23" id="button3"/>
+	
+	<mx:Script>
+		<![CDATA[
+			import com.facebook.commands.status.SetStatus;
+			import air.update.events.StatusUpdateErrorEvent;
+			import com.facebook.data.photos.GetPhotosData;
+			import com.facebook.commands.photos.GetPhotos;
+			import com.facebook.data.photos.PhotoCollection;
+			import com.facebook.data.photos.PhotoData;
+			import com.facebook.Facebook;
+			import com.facebook.utils.DesktopSessionHelper;
+			import com.facebook.events.FacebookEvent;
+			import com.facebook.data.photos.GetAlbumsData;
+			import com.facebook.data.photos.GetCreateAlbumData;
+			import com.facebook.commands.photos.GetAlbums;
+			import com.facebook.data.photos.AlbumData;
+			import com.facebook.commands.photos.UploadPhoto;
+			import com.facebook.net.FacebookCall;
+			import com.facebook.commands.photos.CreateAlbum;
+			
+			import mx.collections.ArrayCollection;
+			import flash.utils.Timer;
+			
+			
+			
+			[Bindable] private var dropBoxDP:ArrayCollection = new ArrayCollection();
+			private var fb:Facebook;
+			private var fbDesktopHelper:DesktopSessionHelper;
+			[Bindable] private var fbAlbums:ArrayCollection;
+			[Bindable] private var fbPhotos:ArrayCollection = new ArrayCollection();;
+			//private var fbPhotoArray:ArrayCollection = new ArrayCollection();
+			public var uploadPhoto:UploadPhoto;
+			public var fbEvent:FacebookEvent;
+			
+			
+			public const FB_API_KEY:String = '60a6ac59337b032286ecebd61210585c';
+			[Bindable] public var fbLoggedIn:Boolean = false;
+			[Bindable] public var picasaLoggedIn:Boolean = false;
+			[Bindable] public var twitterLoggedIn:Boolean = false;
+			public var timer:Timer;
+			
+			public function fbLoginFunc():void {
+				fbDesktopHelper = new DesktopSessionHelper();
+				fbDesktopHelper.apiKey = FB_API_KEY;
+				fbDesktopHelper.addEventListener(FacebookEvent.CONNECT, fbOnConnect, false, 0, true);
+				fbDesktopHelper.login();
+				//fbDesktopHelper.addEventListener(FacebookEvent.LOGOUT, onLogout, false, 0, true);
+				//fbDesktopHelper.addEventListener(FacebookEvent.LOGIN_FAILURE, onLoginFailure, false, 0, true);
+				//fbDesktopHelper.addEventListener(FacebookEvent.ERROR, onError, false, 0, true);
+			}
+			public function fbOnConnect(e:FacebookEvent):void {
+				this.FBLogin.enabled = false;
+				this.fbLoggedIn = true;
+				fb = fbDesktopHelper.facebook;
+				getFBAlbums();
+			}
+
+			public function getFBAlbums():void {
+				var call:FacebookCall = fb.post(new GetAlbums(fb.uid));
+				call.addEventListener(FacebookEvent.COMPLETE, handleFBGetAlbumsResponse);
+			}
+			
+			public function getFBAlbumPics(aid:String):void {
+				var call:FacebookCall = fb.post(new GetPhotos(null,aid));
+				call.addEventListener(FacebookEvent.COMPLETE, handleFBGetAlbumPicsResponse);
+			}
+			
+			public function handleFBGetAlbumsResponse(e:FacebookEvent):void {
+				var albumsResponseData:GetAlbumsData = e.data as GetAlbumsData;
+				if (!albumsResponseData || e.error){ // an error occurred
+					return;
+				}
+				
+				fbAlbums = new ArrayCollection(); 		
+				for(var i:int = 0; i < albumsResponseData.albumCollection.length; i++){
+					fbAlbums.addItem(albumsResponseData.albumCollection.getItemAt(i));
+					//getFBAlbumPics(albumsResponseData.albumCollection.getItemAt(i).aid);	
+				}
+				
+			}
+			
+			public function handleFBGetAlbumPicsResponse(e:FacebookEvent):void {
+				var albumsPicResponseData:GetPhotosData = e.data as GetPhotosData;
+				
+				if (!albumsPicResponseData || e.error){ // an error occurred
+					return;
+				}
+//				if(FBChkBox.enabled) {
+//					fbPhotoArray.addItem(albumsPicResponseData.photoCollection);
+				fbPhotos.source = albumsPicResponseData.photoCollection.source;
+			}
+			
+			public function onBrowseClick():void {
+				var file:File = new File();
+				var imgFilter:FileFilter = new FileFilter("Image Files *.jpg;*.jpeg;*.gif;*.xbm;*.wbmp,*.iff,*.jp2,*.tiff,*.psd,*.png", "*.jpg;*.jpeg;*.gif;*.xbm;*.wbmp,*.iff,*.jp2,*.tiff,*.psd,*.png");
+				file.addEventListener(FileListEvent.SELECT_MULTIPLE, file_selectMultiple);
+				file.browseForOpenMultiple("Select image files",[imgFilter]);
+			}
+			
+			private function file_selectMultiple(evt:FileListEvent):void {
+		 		for(var i:int = 0; i<evt.files.length; i++) {
+		 			var file:File = evt.files[i];
+		 			if(dropBoxDP.source.indexOf(file.nativePath) == -1) {
+ 							dropBoxDP.addItem(file);
+		 			}
+		 		}
+           	}
+           	
+           	private function handleUploadClick():void {
+           		currentState = "Uploading";
+           		if(FBChkBox.selected) {
+	           		if(this.FBNewAlbumRadio) {
+	           			//var createAlbum:CreateAlbum;
+		           		var call:FacebookCall = fb.post(new CreateAlbum(FBAlbumName.text));
+		           		call.addEventListener(FacebookEvent.COMPLETE,fbAlbumCreateSuccess);
+		           		
+	           		}
+		        } else {
+		        	DoUpload();
+		        }
+           		
+           	}
+           	
+           	private function fbAlbumCreateSuccess(e:FacebookEvent):void {
+           		var createdAlbumData:GetCreateAlbumData = e.data as GetCreateAlbumData;
+           		var albumData:AlbumData = createdAlbumData.albumData;
+           		DoUpload(albumData);	
+           	}
+           	
+           	private function DoUpload(albumData:AlbumData = null):void {
+           		for(var i:int = 0; i<dropBoxDP.length; i++) { 
+                	var fileStream:FileStream = new FileStream();
+                	fileStream.open(dropBoxDP[i],FileMode.READ);
+                	var imageData:ByteArray = new ByteArray();
+		           	fileStream.readBytes(imageData);
+		           	if(albumData) {
+		           		uploadPhoto = fb.post(new UploadPhoto(imageData, albumData.aid, dropBoxDP[i].name,null)) as UploadPhoto;
+		         	} else {
+						var album:AlbumData = fbAlbums[FBComboBox.selectedIndex] as AlbumData;
+		           		uploadPhoto = fb.post(new UploadPhoto(imageData, album.aid, dropBoxDP[i].name,null)) as UploadPhoto;			           			
+		           	}
+			    }
+	       	}
+           	
+			public function onFBAlbumChange():void {
+				getFBAlbumPics(FBComboBox.selectedItem.aid);	
+				//fbPhotos.source = fbPhotoArray[fbPhotoArray.source.indexOf(FBComboBox.selectedItem)];
+				//name[FBComboBox.selectedIndex].source;
+			}
+			
+			public function uploaderClicked():void {
+				currentState = "Photo Uploader Intermediate"; 
+			}
+			public function statusUpdaterClicked():void {
+				currentState = "Status Updater Intermediate";
+			}
+			
+			public function funcf1(b:Boolean = false):void {
+				timer = new Timer(1000);
+				if(b) {
+					timer.addEventListener(TimerEvent.TIMER, changeStateforStatus);
+				}else {
+					timer.addEventListener(TimerEvent.TIMER, changeStateforPhoto);	
+				}
+				timer.start();
+				
+			}
+			public function fbChangeStatus():void {
+				currentState = "Updating";
+				var call:FacebookCall = fb.post(new SetStatus(statusArea.text));
+				call.addEventListener(FacebookEvent.COMPLETE, fbStatusChanged);
+			}
+			
+			public function fbStatusChanged(event:FacebookEvent):void {
+				currentState = "Updating";
+			}
+			
+			public function changeStateforPhoto(event:TimerEvent):void {
+				currentState = "Photo Uploader Intermediate1";
+				timer.stop();
+				
+			}
+			public function changeStateforStatus(event:TimerEvent):void {
+				currentState = "Status Updater Intermediate1";
+				timer.stop();
+				
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:Style source="Ice.css" />
+	
+</mx:WindowedApplication>
